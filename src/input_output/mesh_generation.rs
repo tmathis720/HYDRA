@@ -1,4 +1,4 @@
-use crate::domain::{Mesh, MeshEntity};
+use crate::domain::{mesh::Mesh, MeshEntity};
 
 pub struct MeshGenerator;
 
@@ -179,8 +179,8 @@ impl MeshGenerator {
         }
     }
 
-    /// Generate faces for a 3D rectangular mesh
-    fn _generate_faces_3d(mesh: &mut Mesh, nx: usize, ny: usize, nz: usize) {
+    // Generate faces for a 3D rectangular mesh
+/*     fn _generate_faces_3d(mesh: &mut Mesh, nx: usize, ny: usize, nz: usize) {
         for k in 0..nz {
             for j in 0..ny {
                 for i in 0..nx {
@@ -207,5 +207,5 @@ impl MeshGenerator {
                 }
             }
         }
-    }
+    } */
 }

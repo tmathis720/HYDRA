@@ -576,6 +576,8 @@ dependencies = [
  "criterion",
  "crossbeam",
  "faer",
+ "pest",
+ "pest_derive",
  "rand",
  "rayon",
  "rustc-hash",

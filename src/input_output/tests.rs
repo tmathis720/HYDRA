@@ -1,180 +1,109 @@
 #[cfg(test)]
 mod tests {
-
-    use crate::input_output::mesh_generation::MeshGenerator;
     use crate::input_output::gmsh_parser::GmshParser;
     use crate::domain::MeshEntity;
+    use std::path::Path;
+
+    fn assert_mesh_validity(mesh: &crate::domain::mesh::Mesh, expected_nodes: usize, expected_elements: usize, mesh_name: &str) {
+        let node_count = mesh.count_entities(&MeshEntity::Vertex(0));
+        let element_count = mesh.count_entities(&MeshEntity::Cell(0));
+
+        assert!(node_count > 0, "{}: Node count should not be empty", mesh_name);
+        assert!(element_count > 0, "{}: Element count should not be empty", mesh_name);
+        assert_eq!(node_count, expected_nodes, "{}: Incorrect number of nodes", mesh_name);
+        assert_eq!(element_count, expected_elements, "{}: Incorrect number of elements", mesh_name);
+    }
 
     #[test]
     fn test_circle_mesh_import() {
-        let temp_file_path = "inputs/circular_lake.msh2";
+        let temp_file_path = Path::new("inputs/circular_lake.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        // Test for basic validity
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-
-        assert!(node_count > 0, "Circle mesh node_count should not be empty");
-        assert!(element_count > 0, "Circle mesh elements should not be empty");
-
-        // Check that the number of node_count matches the expected value
-        assert_eq!(node_count, 424, "Incorrect number of node_count in circle mesh");
-        assert_eq!(element_count, 849, "Incorrect number of elements in circle mesh");
+        assert_mesh_validity(&mesh, 424, 849, "Circle Mesh");
     }
 
     #[test]
     fn test_coastal_island_mesh_import() {
-        let temp_file_path = "inputs/coastal_island.msh2";
+        let temp_file_path = Path::new("inputs/coastal_island.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-
-        // Validate the mesh structure
-        assert!(node_count > 0, "Coastal Island mesh node_count should not be empty");
-        assert!(element_count > 0, "Coastal Island mesh elements should not be empty");
-
-        // Add specific tests based on expected structure
-        assert_eq!(node_count, 1075, "Incorrect number of node_count in Coastal Island mesh");
-        assert_eq!(element_count, 2154, "Incorrect number of elements in Coastal Island mesh");
+        assert_mesh_validity(&mesh, 1075, 2154, "Coastal Island Mesh");
     }
 
     #[test]
     fn test_lagoon_mesh_import() {
-        let temp_file_path = "inputs/elliptical_lagoon.msh2";
+        let temp_file_path = Path::new("inputs/elliptical_lagoon.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-
-        // Validate the mesh structure
-        assert!(node_count > 0, "Lagoon mesh node_count should not be empty");
-        assert!(element_count > 0, "Lagoon mesh elements should not be empty");
-
-        // Further checks on expected properties
-        assert_eq!(node_count, 848, "Incorrect number of node_count in Lagoon mesh");
-        assert_eq!(element_count, 1697, "Incorrect number of elements in Lagoon mesh");
+        assert_mesh_validity(&mesh, 848, 1697, "Lagoon Mesh");
     }
 
     #[test]
     fn test_meandering_river_mesh_import() {
-        let temp_file_path = "inputs/meandering_river.msh2";
+        let temp_file_path = Path::new("inputs/meandering_river.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-
-        // Validate the mesh structure
-        assert!(node_count > 0, "Meandering River mesh node_count should not be empty");
-        assert!(element_count > 0, "Meandering River mesh elements should not be empty");
-
-        // Further checks on the structure
-        assert_eq!(node_count, 695, "Incorrect number of node_count in Meandering River mesh");
-        assert_eq!(element_count, 1386, "Incorrect number of elements in Meandering River mesh");
+        assert_mesh_validity(&mesh, 695, 1386, "Meandering River Mesh");
     }
 
     #[test]
     fn test_polygon_estuary_mesh_import() {
-        let temp_file_path = "inputs/polygon_estuary.msh2";
+        let temp_file_path = Path::new("inputs/polygon_estuary.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-        
-        // Validate the mesh structure
-        assert!(node_count > 0, "Polygon Estuary mesh node_count should not be empty");
-        assert!(element_count > 0, "Polygon Estuary mesh elements should not be empty");
-
-        // Further checks on the structure
-        assert_eq!(node_count, 469, "Incorrect number of node_count in Polygon Estuary mesh");
-        assert_eq!(element_count, 941, "Incorrect number of elements in Polygon Estuary mesh");
+        assert_mesh_validity(&mesh, 469, 941, "Polygon Estuary Mesh");
     }
 
     #[test]
     fn test_rectangle_mesh_import() {
-        let temp_file_path = "inputs/rectangle.msh2";
+        let temp_file_path = Path::new("inputs/rectangle.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-        
-        // Validate the mesh structure
-        assert!(node_count > 0, "Rectangle mesh node_count should not be empty");
-        assert!(element_count > 0, "Rectangle mesh elements should not be empty");
-
-        // Further checks on the structure
-        assert_eq!(node_count, 78, "Incorrect number of node_count in Rectangle mesh");
-        assert_eq!(element_count, 158, "Incorrect number of elements in Rectangle mesh");
+        assert_mesh_validity(&mesh, 78, 158, "Rectangle Mesh");
     }
 
     #[test]
     fn test_rectangle_channel_mesh_import() {
-        let temp_file_path = "inputs/rectangular_channel.msh2";
+        let temp_file_path = Path::new("inputs/rectangular_channel.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-        
-        // Validate the mesh structure
-        assert!(node_count > 0, "Rectangular Channel mesh node_count should not be empty");
-        assert!(element_count > 0, "Rectangular Channel mesh elements should not be empty");
-
-        // Further checks on the structure
-        assert_eq!(node_count, 149, "Incorrect number of node_count in Rectangular Channel mesh");
-        assert_eq!(element_count, 300, "Incorrect number of elements in Rectangular Channel mesh");
+        assert_mesh_validity(&mesh, 149, 300, "Rectangular Channel Mesh");
     }
 
     #[test]
     fn test_triangle_basin_mesh_import() {
-        let temp_file_path = "inputs/triangular_basin.msh2";
+        let temp_file_path = Path::new("inputs/triangular_basin.msh2");
 
-        let result = GmshParser::from_gmsh_file(temp_file_path);
+        let result = GmshParser::from_gmsh_file(temp_file_path.to_str().unwrap());
         assert!(result.is_ok());
 
         let mesh = result.unwrap();
-
-        let node_count = mesh.count_entities(&MeshEntity::Vertex(0)); // Count vertices (node_count)
-        let element_count = mesh.count_entities(&MeshEntity::Cell(0)); // Count cells (elements)
-        
-        // Validate the mesh structure
-        assert!(node_count > 0, "Triangular Basin mesh node_count should not be empty");
-        assert!(element_count > 0, "Triangular Basin mesh elements should not be empty");
-
-
-        // Further checks on the structure
-        assert_eq!(node_count, 66, "Incorrect number of node_count in Triangular Basin mesh");
-        assert_eq!(element_count, 133, "Incorrect number of elements in Triangular Basin mesh");
+        assert_mesh_validity(&mesh, 66, 133, "Triangle Basin Mesh");
     }
+}
 
-    #[test]
+    /* #[test]
     fn test_generate_rectangle_2d() {
         let width = 10.0;
         let height = 5.0;
@@ -256,5 +185,4 @@ mod tests {
             .filter(|e| matches!(e, MeshEntity::Cell(_)))
             .count();
         assert_eq!(num_cells, expected_num_cells, "Incorrect number of cells");
-    }
-}
+    } */

@@ -1,0 +1,209 @@
+// GMSH.pest - A grammar for parsing GMSH MSH v2.2 (Legacy) files
+
+WHITESPACE = _{ " " | "\t" }
+NEWLINE = { "\r\n" | "\n" | "\r" }
+
+// Top level structure for GMSH file
+file = { SOI ~ section* ~ EOI }
+
+// Sections in the file (nodes, elements, etc.)
+section = {
+    mesh_format_section |
+    physical_names_section |
+    nodes_section |
+    elements_section |
+    periodic_section |
+    node_data_section |
+    element_data_section |
+    element_node_data_section |
+    interpolation_scheme_section
+}
+
+// Mesh format section
+mesh_format_section = {
+    "$MeshFormat" ~ NEWLINE ~
+    version_number ~
+    file_type ~
+    data_size ~ NEWLINE ~
+    "$EndMeshFormat" ~ NEWLINE
+}
+
+version_number = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
+file_type = @{ ASCII_DIGIT+ }
+data_size = @{ ASCII_DIGIT+ }
+
+// Physical names section
+physical_names_section = {
+    "$PhysicalNames" ~ NEWLINE ~
+    physical_group_count ~ NEWLINE ~
+    physical_group* ~
+    "$EndPhysicalNames" ~ NEWLINE
+}
+
+physical_group_count = @{ ASCII_DIGIT+ }
+physical_group = {
+    group_dimension ~
+    group_tag ~
+    quoted_string ~ NEWLINE
+}
+
+group_dimension = @{ ASCII_DIGIT+ }
+group_tag = @{ ASCII_DIGIT+ }
+quoted_string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+
+// Nodes section
+nodes_section = {
+    "$Nodes" ~ NEWLINE ~
+    node_count ~ NEWLINE ~
+    node* ~
+    "$EndNodes" ~ NEWLINE
+}
+
+node_count = @{ ASCII_DIGIT+ }
+node = {
+    node_id ~
+    float ~
+    float ~
+    float ~ NEWLINE
+}
+
+node_id = @{ ASCII_DIGIT+ }
+float = @{ "-"? ~ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+
+// Elements section
+elements_section = {
+    "$Elements" ~ NEWLINE ~
+    element_count ~ NEWLINE ~
+    element* ~
+    "$EndElements" ~ NEWLINE
+}
+
+element_count = @{ ASCII_DIGIT+ }
+element = {
+    element_id ~
+    element_type ~
+    tag_count ~
+    tag* ~
+    node_id+ ~ NEWLINE
+}
+
+element_id = @{ ASCII_DIGIT+ }
+element_type = @{ ASCII_DIGIT+ }
+tag_count = @{ ASCII_DIGIT+ }
+tag = @{ ASCII_DIGIT+ }
+
+// Periodic section
+periodic_section = {
+    "$Periodic" ~ NEWLINE ~
+    periodic_entity_count ~ NEWLINE ~
+    periodic_entity* ~
+    "$EndPeriodic" ~ NEWLINE
+}
+
+periodic_entity_count = @{ ASCII_DIGIT+ }
+periodic_entity = {
+    dimension ~
+    entity_tag ~
+    master_entity_tag ~ NEWLINE ~
+    affine_transform? ~
+    node_mapping+
+}
+
+dimension = @{ ASCII_DIGIT+ }
+entity_tag = @{ ASCII_DIGIT+ }
+master_entity_tag = @{ ASCII_DIGIT+ }
+
+affine_transform = {
+    "<Affine" ~
+    float+ ~ ">"
+}
+
+node_mapping = {
+    node_id ~
+    master_node_id ~ NEWLINE
+}
+
+master_node_id = @{ ASCII_DIGIT+ }
+
+// NodeData section
+node_data_section = {
+    "$NodeData" ~ NEWLINE ~
+    string_tag_count ~ NEWLINE ~
+    string_tag* ~
+    real_tag_count ~ NEWLINE ~
+    real_tag* ~
+    integer_tag_count ~ NEWLINE ~
+    integer_tag* ~
+    node_value* ~
+    "$EndNodeData" ~ NEWLINE
+}
+
+string_tag_count = @{ ASCII_DIGIT+ }
+string_tag = { quoted_string ~ NEWLINE }
+real_tag_count = @{ ASCII_DIGIT+ }
+real_tag = @{ float ~ NEWLINE }
+integer_tag_count = @{ ASCII_DIGIT+ }
+integer_tag = @{ ASCII_DIGIT+ ~ NEWLINE }
+node_value = { node_id ~ float ~ NEWLINE }
+
+// ElementData section
+element_data_section = {
+    "$ElementData" ~ NEWLINE ~
+    string_tag_count ~ NEWLINE ~
+    string_tag* ~
+    real_tag_count ~ NEWLINE ~
+    real_tag* ~
+    integer_tag_count ~ NEWLINE ~
+    integer_tag* ~
+    element_value* ~
+    "$EndElementData" ~ NEWLINE
+}
+
+element_value = { element_id ~ float ~ NEWLINE }
+
+// ElementNodeData section
+element_node_data_section = {
+    "$ElementNodeData" ~ NEWLINE ~
+    string_tag_count ~ NEWLINE ~
+    string_tag* ~
+    real_tag_count ~ NEWLINE ~
+    real_tag* ~
+    integer_tag_count ~ NEWLINE ~
+    integer_tag* ~
+    element_node_value* ~
+    "$EndElementNodeData" ~ NEWLINE
+}
+
+element_node_value = {
+    element_id ~
+    node_per_element_count ~
+    float* ~ NEWLINE
+}
+
+node_per_element_count = @{ ASCII_DIGIT+ }
+
+// InterpolationScheme section
+interpolation_scheme_section = {
+    "$InterpolationScheme" ~ NEWLINE ~
+    quoted_string ~ NEWLINE ~
+    element_topology_count ~ NEWLINE ~
+    element_topology* ~
+    "$EndInterpolationScheme" ~ NEWLINE
+}
+
+element_topology_count = @{ ASCII_DIGIT+ }
+element_topology = {
+    element_topology_id ~ NEWLINE ~
+    interpolation_matrix*
+}
+
+element_topology_id = @{ ASCII_DIGIT+ }
+
+interpolation_matrix = {
+    num_rows ~
+    num_columns ~ NEWLINE ~
+    float* ~ NEWLINE
+}
+
+num_rows = @{ ASCII_DIGIT+ }
+num_columns = @{ ASCII_DIGIT+ }

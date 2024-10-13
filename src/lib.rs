@@ -10,7 +10,7 @@ pub mod boundary;
 pub mod solver;
 pub mod time_stepping;
 pub mod linalg;
-//pub mod input_output;
+pub mod input_output;
 pub mod tests;
 
 pub use geometry::{Geometry, CellShape, FaceShape};
